@@ -2,7 +2,7 @@
 
 Tienda virtual de portafolio construida con **Python + Flask + HTML/CSS**.
 
-## ✨ Características
+## Características
 
 - Catálogo de productos con filtros por categoría y búsqueda
 - Slider horizontal con animaciones y drag-to-scroll
@@ -39,7 +39,7 @@ tienda_moda/
         └── cart.js     # API del carrito (fetch)
 ```
 
-## 🚀 Instalación y ejecución
+##  Instalación y ejecución
 
 ```bash
 # 1. Clonar el repositorio
@@ -60,7 +60,7 @@ python app.py
 
 Abrir en el navegador: `http://127.0.0.1:5000`
 
-## 🔑 Credenciales de demo
+##  Credenciales de demo
 
 | Rol   | Email             | Contraseña |
 |-------|-------------------|------------|
@@ -68,7 +68,7 @@ Abrir en el navegador: `http://127.0.0.1:5000`
 
 Los datos de ejemplo (10 productos, 5 categorías) se insertan automáticamente al primer arranque.
 
-## 🎨 Paleta de colores
+##  Paleta de colores
 
 | Variable     | Hex       | Uso                   |
 |--------------|-----------|-----------------------|
