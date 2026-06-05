@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+{% set hide_footer = true %}
+
+{% block title %}Editar producto — NOMA Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <a href="{{ url_for('shop.index') }}" class="admin-sidebar__logo">NOMA</a>
+    <span class="admin-sidebar__label">Navegación</span>
+    <a href="{{ url_for('admin.dashboard') }}" class="admin-sidebar__link active">← Dashboard</a>
+    <a href="{{ url_for('admin.add_product') }}" class="admin-sidebar__link">+ Agregar producto</a>
+    <a href="{{ url_for('admin.orders') }}" class="admin-sidebar__link">Pedidos</a>
+    <a href="{{ url_for('auth.logout') }}" class="admin-sidebar__link">Cerrar sesión</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 class="admin-title">Editar: {{ product.name }}</h1>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost">← Volver</a>
+    </div>
+
+    <div class="admin-form">
+      <form method="POST" action="{{ url_for('admin.edit_product', product_id=product.id) }}">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+          <div class="form-group">
+            <label class="form-label" for="name">Nombre del producto *</label>
+            <input class="form-input" type="text" id="name" name="name"
+                   value="{{ product.name }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="price">Precio (S/) *</label>
+            <input class="form-input" type="number" id="price" name="price"
+                   step="0.01" min="0" value="{{ product.price }}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Descripción</label>
+          <textarea class="form-input" id="description" name="description"
+                    rows="3">{{ product.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="image_url">URL de imagen</label>
+          <input class="form-input" type="url" id="image_url" name="image_url"
+                 value="{{ product.image_url or '' }}">
+        </div>
+
+        {% if product.image_url %}
+        <div style="margin-bottom:1.5rem;">
+          <p class="form-label">Imagen actual</p>
+          <img src="{{ product.image_url }}" alt="{{ product.name }}"
+               style="max-height:180px;border-radius:8px;object-fit:cover;border:1px solid rgba(186,177,149,0.15);">
+        </div>
+        {% endif %}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;">
+          <div class="form-group">
+            <label class="form-label" for="stock">Stock</label>
+            <input class="form-input" type="number" id="stock" name="stock"
+                   min="0" value="{{ product.stock }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="category_id">Categoría</label>
+            <select class="form-input" id="category_id" name="category_id">
+              <option value="">— Sin categoría —</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}"
+                  {% if product.category_id == cat.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" name="featured" id="featured"
+                   {% if product.featured %}checked{% endif %}>
+            Producto destacado
+          </label>
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-top:0.5rem;">
+          <button type="submit" class="btn btn--primary" style="padding:0.9rem 2rem;">
+            Guardar cambios
+          </button>
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}

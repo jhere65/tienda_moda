@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}NOMA — Moda que define tu esencia{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="hero__grain"></div>
+  <div class="hero__accent"></div>
+
+  <div class="hero__content">
+    <span class="hero__eyebrow">Nueva colección 2025</span>
+    <h1 class="hero__title">
+      La moda<br>es <em>silencio</em><br>que habla.
+    </h1>
+    <p class="hero__subtitle">
+      Piezas pensadas para quienes no necesitan hablar fuerte. Calidad artesanal, diseño sin excusas.
+    </p>
+    <div class="hero__actions">
+      <a href="{{ url_for('shop.catalog') }}" class="btn btn--primary">Explorar colección</a>
+      <a href="{{ url_for('shop.catalog') }}?categoria=vestidos" class="btn btn--ghost">Ver vestidos</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRODUCTOS DESTACADOS — Slider ===== -->
+<section class="section">
+  <div class="section__header flex justify-between items-center">
+    <div>
+      <span class="section__eyebrow">Lo más destacado</span>
+      <h2 class="section__title">Piezas del momento</h2>
+    </div>
+    <a href="{{ url_for('shop.catalog') }}" class="btn btn--ghost">Ver todo</a>
+  </div>
+
+  <div class="slider-wrapper" id="featured-slider">
+    <button class="slider-btn slider-btn--prev" aria-label="Anterior">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="slider-track">
+      {% for product in featured %}
+      <article class="product-card" onclick="location.href='{{ url_for('shop.product_detail', product_id=product.id) }}'">
+        <div class="product-card__image">
+          {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+          {% else %}
+            <div style="width:100%;height:100%;background:var(--dark-2);display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:0.8rem;">Sin imagen</div>
+          {% endif %}
+          {% if product.featured %}
+            <span class="product-card__badge">Destacado</span>
+          {% endif %}
+          <div class="product-card__overlay">
+            <button class="btn btn--primary"
+                    data-add-to-cart="{{ product.id }}"
+                    data-quantity="1"
+                    onclick="event.stopPropagation()">
+              Agregar al carrito
+            </button>
+          </div>
+        </div>
+        <div class="product-card__body">
+          {% if product.category %}
+            <p class="product-card__category">{{ product.category.name }}</p>
+          {% endif %}
+          <h3 class="product-card__name">{{ product.name }}</h3>
+          <p class="product-card__price">S/ {{ "%.2f"|format(product.price) }}</p>
+        </div>
+      </article>
+      {% else %}
+        <p style="color:var(--mid); padding:2rem;">No hay productos destacados aún.</p>
+      {% endfor %}
+    </div>
+
+    <button class="slider-btn slider-btn--next" aria-label="Siguiente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ===== BANNER INTERMEDIO ===== -->
+<section style="padding:0 3rem 5rem;">
+  <div style="background:var(--dark-2);border:1px solid rgba(186,177,149,0.12);border-radius:20px;padding:4rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
+    <div>
+      <span class="section__eyebrow">Nuestra filosofía</span>
+      <h2 style="font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:400;color:var(--off-white);line-height:1.15;margin-bottom:1.2rem;">
+        Cada hilo,<br>una <em style="color:var(--gold);">decisión</em>.
+      </h2>
+      <p style="color:var(--sand);font-size:0.97rem;line-height:1.8;margin-bottom:1.8rem;">
+        Trabajamos con materiales seleccionados y procesos conscientes. La moda no tiene que ser descartable para ser interesante.
+      </p>
+      <a href="{{ url_for('shop.catalog') }}" class="btn btn--primary">Descubrir más</a>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      {% for cat in categories[:4] %}
+      <a href="{{ url_for('shop.catalog') }}?categoria={{ cat.slug }}"
+         style="background:rgba(17,9,26,0.6);border:1px solid rgba(186,177,149,0.12);border-radius:12px;padding:1.5rem;text-align:center;transition:all 0.3s ease;display:block;"
+         onmouseover="this.style.borderColor='rgba(232,209,142,0.3)'"
+         onmouseout="this.style.borderColor='rgba(186,177,149,0.12)'">
+        <p style="font-family:var(--font-display);font-size:1.3rem;color:var(--off-white);margin-bottom:0.25rem;">{{ cat.name }}</p>
+        <p style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);">Ver colección →</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Inicializar el slider principal
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.getElementById('featured-slider');
+  if (!wrapper) return;
+
+  const track   = wrapper.querySelector('.slider-track');
+  const btnPrev = wrapper.querySelector('.slider-btn--prev');
+  const btnNext = wrapper.querySelector('.slider-btn--next');
+
+  const getCardWidth = () => {
+    const card = track.querySelector('.product-card');
+    if (!card) return 320;
+    return card.offsetWidth + 24; // 24 = gap
+  };
+
+  btnNext.addEventListener('click', () => track.scrollBy({ left: getCardWidth() * 2, behavior: 'smooth' }));
+  btnPrev.addEventListener('click', () => track.scrollBy({ left: -getCardWidth() * 2, behavior: 'smooth' }));
+
+  // Drag
+  let isDragging = false, startX = 0, startScroll = 0, lastX = 0, velocity = 0, rafId;
+
+  track.addEventListener('mousedown', e => {
+    isDragging = true; startX = e.clientX; lastX = e.clientX;
+    startScroll = track.scrollLeft; velocity = 0;
+    track.style.cursor = 'grabbing';
+    cancelAnimationFrame(rafId);
+  });
+
+  track.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    velocity = e.clientX - lastX;
+    lastX = e.clientX;
+    track.scrollLeft = startScroll - (e.clientX - startX);
+  });
+
+  const stopDrag = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    track.style.cursor = 'grab';
+    let v = velocity * -2.5;
+    const step = () => {
+      if (Math.abs(v) < 0.5) return;
+      track.scrollLeft += v;
+      v *= 0.92;
+      rafId = requestAnimationFrame(step);
+    };
+    rafId = requestAnimationFrame(step);
+  };
+
+  track.addEventListener('mouseup', stopDrag);
+  track.addEventListener('mouseleave', stopDrag);
+});
+</script>
+{% endblock %}

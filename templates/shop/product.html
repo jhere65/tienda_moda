@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — NOMA{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+  <!-- Imagen -->
+  <div class="product-detail__image-wrap">
+    {% if product.image_url %}
+      <img src="{{ product.image_url }}" alt="{{ product.name }}">
+    {% else %}
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--mid);">Sin imagen</div>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div>
+    {% if product.category %}
+      <p class="product-detail__category">{{ product.category.name }}</p>
+    {% endif %}
+    <h1 class="product-detail__name">{{ product.name }}</h1>
+    <p class="product-detail__price">S/ {{ "%.2f"|format(product.price) }}</p>
+
+    {% if product.description %}
+      <p class="product-detail__desc">{{ product.description }}</p>
+    {% endif %}
+
+    <p class="product-detail__stock">
+      {% if product.stock > 0 %}
+        ✓ En stock ({{ product.stock }} disponibles)
+      {% else %}
+        <span style="color:#e08080;">Agotado</span>
+      {% endif %}
+    </p>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <button class="btn btn--primary"
+              data-add-to-cart="{{ product.id }}"
+              {% if product.stock == 0 %}disabled{% endif %}
+              style="padding:0.9rem 2.5rem;">
+        Agregar al carrito
+      </button>
+      <a href="{{ url_for('shop.cart') }}" class="btn btn--ghost" style="padding:0.9rem 2rem;">
+        Ver carrito
+      </a>
+    </div>
+
+    <!-- Detalles adicionales -->
+    <div class="divider"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div>
+        <p style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">Categoría</p>
+        <p style="color:var(--sand);">{{ product.category.name if product.category else '—' }}</p>
+      </div>
+      <div>
+        <p style="font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);margin-bottom:0.3rem;">Estado</p>
+        {% if product.featured %}
+          <span class="badge badge--gold">Destacado</span>
+        {% else %}
+          <span class="badge badge--sand">Regular</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Productos relacionados -->
+{% if related %}
+<section class="section" style="padding-top:0;">
+  <div class="section__header">
+    <span class="section__eyebrow">Complementa tu look</span>
+    <h2 class="section__title">También te puede gustar</h2>
+  </div>
+  <div class="slider-wrapper">
+    <div class="slider-track">
+      {% for rp in related %}
+      <article class="product-card"
+               onclick="location.href='{{ url_for('shop.product_detail', product_id=rp.id) }}'">
+        <div class="product-card__image">
+          {% if rp.image_url %}
+            <img src="{{ rp.image_url }}" alt="{{ rp.name }}" loading="lazy">
+          {% endif %}
+          <div class="product-card__overlay">
+            <button class="btn btn--primary"
+                    data-add-to-cart="{{ rp.id }}"
+                    onclick="event.stopPropagation()">Agregar</button>
+          </div>
+        </div>
+        <div class="product-card__body">
+          <h3 class="product-card__name">{{ rp.name }}</h3>
+          <p class="product-card__price">S/ {{ "%.2f"|format(rp.price) }}</p>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

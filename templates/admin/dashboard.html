@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+{% set hide_footer = true %}
+
+{% block title %}Panel Admin — NOMA{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <a href="{{ url_for('shop.index') }}" class="admin-sidebar__logo">NOMA</a>
+
+    <span class="admin-sidebar__label">Principal</span>
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="admin-sidebar__link {% if not view %}active{% endif %}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <span class="admin-sidebar__label">Productos</span>
+    <a href="{{ url_for('admin.products') }}"
+       class="admin-sidebar__link {% if view == 'products' %}active{% endif %}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+      Todos los productos
+    </a>
+    <a href="{{ url_for('admin.add_product') }}" class="admin-sidebar__link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Agregar producto
+    </a>
+
+    <span class="admin-sidebar__label">Pedidos</span>
+    <a href="{{ url_for('admin.orders') }}" class="admin-sidebar__link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Pedidos
+    </a>
+
+    <span class="admin-sidebar__label">Cuenta</span>
+    <a href="{{ url_for('shop.index') }}" class="admin-sidebar__link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      Ver tienda
+    </a>
+    <a href="{{ url_for('auth.logout') }}" class="admin-sidebar__link">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </a>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="admin-main">
+
+    {% if not view %}
+    <!-- Vista dashboard -->
+    <div class="admin-header">
+      <h1 class="admin-title">Dashboard</h1>
+      <span style="font-size:0.82rem;color:var(--mid);">Hola, {{ current_user.username }} 👋</span>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-card__label">Productos</p>
+        <p class="stat-card__value">{{ stats.total_products }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Clientes</p>
+        <p class="stat-card__value">{{ stats.total_users }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Pedidos</p>
+        <p class="stat-card__value">{{ stats.total_orders }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Categorías</p>
+        <p class="stat-card__value">{{ stats.categories }}</p>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <h2 style="font-family:var(--font-display);font-size:1.6rem;color:var(--off-white);">Productos recientes</h2>
+      <a href="{{ url_for('admin.add_product') }}" class="btn btn--primary">+ Agregar producto</a>
+    </div>
+
+    {% endif %}
+
+    {% if view == 'products' %}
+    <div class="admin-header">
+      <h1 class="admin-title">Todos los productos</h1>
+      <a href="{{ url_for('admin.add_product') }}" class="btn btn--primary">+ Agregar producto</a>
+    </div>
+    {% endif %}
+
+    <!-- Tabla de productos -->
+    {% set product_list = products if view == 'products' else recent_products %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Destacado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in product_list %}
+        <tr>
+          <td>
+            {% if product.image_url %}
+              <img class="admin-table__thumb" src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+              <div style="width:54px;height:68px;background:var(--dark-1);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:0.7rem;">N/A</div>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('shop.product_detail', product_id=product.id) }}"
+               style="color:var(--off-white);font-family:var(--font-display);font-size:1.1rem;">
+              {{ product.name }}
+            </a>
+          </td>
+          <td><span class="badge badge--sand">{{ product.category.name if product.category else '—' }}</span></td>
+          <td style="color:var(--gold);font-weight:600;">S/ {{ "%.2f"|format(product.price) }}</td>
+          <td>
+            <span class="badge {% if product.stock > 5 %}badge--green{% elif product.stock > 0 %}badge--gold{% else %}badge--red{% endif %}">
+              {{ product.stock }}
+            </span>
+          </td>
+          <td>
+            {% if product.featured %}
+              <span class="badge badge--gold">✓</span>
+            {% else %}
+              <span style="color:var(--mid);">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:0.5rem;">
+              <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"
+                 class="btn btn--dark" style="padding:0.35rem 0.85rem;font-size:0.75rem;">
+                Editar
+              </a>
+              <form method="POST"
+                    action="{{ url_for('admin.delete_product', product_id=product.id) }}"
+                    style="display:inline;">
+                <button type="submit" class="btn btn--danger"
+                        style="padding:0.35rem 0.85rem;font-size:0.75rem;"
+                        data-confirm="¿Eliminar '{{ product.name }}'? Esta acción no se puede deshacer.">
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--mid);">No hay productos todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </main>
+</div>
+{% endblock %}

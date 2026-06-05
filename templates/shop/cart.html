@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Carrito — NOMA{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:8rem;">
+  <div class="section__header">
+    <span class="section__eyebrow">Mi selección</span>
+    <h1 class="section__title">Carrito de compras</h1>
+  </div>
+
+  {% if items %}
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:3rem;align-items:start;">
+
+    <!-- Lista de items -->
+    <div>
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr data-cart-row="{{ item.product.id }}">
+            <td>
+              <div style="display:flex;align-items:center;gap:1rem;">
+                {% if item.product.image_url %}
+                  <img class="cart-item__image" src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+                {% endif %}
+                <div>
+                  <a href="{{ url_for('shop.product_detail', product_id=item.product.id) }}"
+                     style="font-family:var(--font-display);font-size:1.15rem;color:var(--off-white);">
+                    {{ item.product.name }}
+                  </a>
+                  {% if item.product.category %}
+                    <p style="font-size:0.75rem;color:var(--mid);">{{ item.product.category.name }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--sand);">S/ {{ "%.2f"|format(item.product.price) }}</td>
+            <td style="color:var(--off-white);">{{ item.quantity }}</td>
+            <td style="color:var(--gold);font-weight:600;">S/ {{ "%.2f"|format(item.subtotal) }}</td>
+            <td>
+              <button class="btn btn--danger"
+                      data-remove-from-cart="{{ item.product.id }}"
+                      style="padding:0.35rem 0.8rem;font-size:0.75rem;">
+                ✕ Quitar
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="margin-top:1.5rem;">
+        <a href="{{ url_for('shop.catalog') }}" class="btn btn--ghost">← Seguir comprando</a>
+      </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="cart-summary">
+      <h3 style="font-family:var(--font-display);font-size:1.6rem;color:var(--off-white);margin-bottom:1.5rem;">Resumen</h3>
+
+      <div class="cart-summary__row">
+        <span>Subtotal</span>
+        <span>S/ {{ "%.2f"|format(total) }}</span>
+      </div>
+      <div class="cart-summary__row">
+        <span>Envío</span>
+        <span style="color:var(--gold);">Gratis</span>
+      </div>
+      <div class="divider"></div>
+      <div class="cart-summary__row" style="margin-bottom:1.5rem;">
+        <span style="font-size:1rem;color:var(--off-white);">Total</span>
+        <span class="cart-summary__total">S/ {{ "%.2f"|format(total) }}</span>
+      </div>
+
+      <button class="btn btn--primary" style="width:100%;padding:1rem;font-size:0.9rem;"
+              onclick="alert('Funcionalidad de pago — próximamente');">
+        Proceder al pago
+      </button>
+
+      <p style="font-size:0.75rem;color:var(--mid);text-align:center;margin-top:1rem;">
+        Tienda de portafolio — sin pagos reales
+      </p>
+    </div>
+  </div>
+
+  {% else %}
+  <div style="text-align:center;padding:6rem 0;">
+    <p style="font-family:var(--font-display);font-size:2.5rem;color:var(--off-white);margin-bottom:1rem;">Tu carrito está vacío</p>
+    <p style="color:var(--mid);margin-bottom:2rem;">Todavía no has agregado ninguna prenda.</p>
+    <a href="{{ url_for('shop.catalog') }}" class="btn btn--primary">Explorar colección</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

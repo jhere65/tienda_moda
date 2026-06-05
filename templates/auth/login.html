@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set hide_footer = true %}
+
+{% block title %}Iniciar sesión — NOMA{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <a href="{{ url_for('shop.index') }}" class="auth-card__logo">NOMA</a>
+    <p class="auth-card__tagline">Bienvenido de nuevo</p>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="form-group">
+        <label class="form-label" for="email">Correo electrónico</label>
+        <input class="form-input" type="email" id="email" name="email"
+               placeholder="tu@correo.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Contraseña</label>
+        <input class="form-input" type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div class="form-group">
+        <label class="form-checkbox">
+          <input type="checkbox" name="remember">
+          Recordarme
+        </label>
+      </div>
+      <button type="submit" class="btn btn--primary" style="width:100%;padding:0.85rem;">
+        Iniciar sesión
+      </button>
+    </form>
+
+    <div class="divider"></div>
+    <p style="text-align:center;font-size:0.88rem;color:var(--mid);">
+      ¿No tienes cuenta?
+      <a href="{{ url_for('auth.register') }}" style="color:var(--gold);">Regístrate</a>
+    </p>
+
+    <!-- Credenciales de demo -->
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(232,209,142,0.07);border:1px solid rgba(232,209,142,0.15);border-radius:8px;">
+      <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;">Demo</p>
+      <p style="font-size:0.82rem;color:var(--sand);">Admin: <code style="color:var(--gold);">admin@noma.com</code> / <code style="color:var(--gold);">admin123</code></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

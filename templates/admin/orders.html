@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% set hide_navbar = true %}
+{% set hide_footer = true %}
+
+{% block title %}Pedidos — NOMA Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <a href="{{ url_for('shop.index') }}" class="admin-sidebar__logo">NOMA</a>
+    <span class="admin-sidebar__label">Principal</span>
+    <a href="{{ url_for('admin.dashboard') }}" class="admin-sidebar__link">Dashboard</a>
+    <a href="{{ url_for('admin.products') }}" class="admin-sidebar__link">Todos los productos</a>
+    <a href="{{ url_for('admin.add_product') }}" class="admin-sidebar__link">+ Agregar producto</a>
+    <span class="admin-sidebar__label">Pedidos</span>
+    <a href="{{ url_for('admin.orders') }}" class="admin-sidebar__link active">Pedidos</a>
+    <span class="admin-sidebar__label">Cuenta</span>
+    <a href="{{ url_for('shop.index') }}" class="admin-sidebar__link">Ver tienda</a>
+    <a href="{{ url_for('auth.logout') }}" class="admin-sidebar__link">Cerrar sesión</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 class="admin-title">Pedidos</h1>
+      <span style="font-size:0.85rem;color:var(--mid);">{{ orders|length }} pedido(s) en total</span>
+    </div>
+
+    {% if orders %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Cliente</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td style="color:var(--gold);font-weight:600;">#{{ order.id }}</td>
+          <td style="color:var(--off-white);">{{ order.customer.username }}</td>
+          <td style="color:var(--gold);font-weight:600;">S/ {{ "%.2f"|format(order.total) }}</td>
+          <td>
+            {% if order.status == 'pendiente' %}
+              <span class="badge badge--gold">Pendiente</span>
+            {% elif order.status == 'procesando' %}
+              <span class="badge badge--blue">Procesando</span>
+            {% elif order.status == 'enviado' %}
+              <span class="badge badge--sand">Enviado</span>
+            {% elif order.status == 'entregado' %}
+              <span class="badge badge--green">Entregado</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--mid);font-size:0.85rem;">
+            {{ order.created.strftime('%d/%m/%Y %H:%M') }}
+          </td>
+          <td>
+            <form method="POST"
+                  action="{{ url_for('admin.update_order_status', order_id=order.id) }}"
+                  style="display:flex;gap:0.5rem;align-items:center;">
+              <select name="status" class="form-input"
+                      style="padding:0.3rem 0.6rem;font-size:0.8rem;width:auto;">
+                <option value="pendiente"  {% if order.status=='pendiente'  %}selected{% endif %}>Pendiente</option>
+                <option value="procesando" {% if order.status=='procesando' %}selected{% endif %}>Procesando</option>
+                <option value="enviado"    {% if order.status=='enviado'    %}selected{% endif %}>Enviado</option>
+                <option value="entregado"  {% if order.status=='entregado'  %}selected{% endif %}>Entregado</option>
+              </select>
+              <button type="submit" class="btn btn--dark"
+                      style="padding:0.3rem 0.8rem;font-size:0.75rem;">
+                Actualizar
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% else %}
+    <div style="text-align:center;padding:5rem 0;">
+      <p style="font-family:var(--font-display);font-size:2rem;color:var(--off-white);margin-bottom:1rem;">
+        Sin pedidos aún
+      </p>
+      <p style="color:var(--mid);">Cuando los clientes realicen pedidos aparecerán aquí.</p>
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}
